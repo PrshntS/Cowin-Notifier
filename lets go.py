@@ -70,8 +70,8 @@ directory=get_calender(district_id,headers)
 
 content = "\n".join([format(element) for element in directory])
 
-username = "sainiprashant232@gmail.com"
-password = "epfksdmqjiqhyxjq"
+username = ""
+password = ""
 
 print(content)
 
