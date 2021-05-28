@@ -1,9 +1,10 @@
 import requests
+import schedule
+import time
 from datetime import date
 import email
 import smtplib
-from requests.api import head
-from requests.sessions import session
+
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0"}
 
 
@@ -13,7 +14,7 @@ def get_state_id(headers):
     state_name=input("Enter the state name: ")
     a=-1
     for states in r_dict:
-        if states["state_name"]=="Uttar Pradesh":
+        if states["state_name"]==state_name:
            a=states["state_id"]
     return a
 
@@ -59,36 +60,49 @@ def get_calender(district_id,headers):
     # print(dict)
     return dict
         
+def job(district_id,headers):
+    directory=get_calender(district_id,headers)
+    # print(directory)
+
+
+    content = "\n".join([format(element) for element in directory])
+
+    username = ""
+    password = ""
+
+    print(content)
+
+    if not content:
+        print("No availability")
+       
+    else:
+        email_msg = email.message.EmailMessage()
+        email_msg["Subject"] = "Vaccination Slot Open"
+        email_msg["From"] = username
+        email_msg["To"] = username
+        email_msg.set_content(content)
+
+        with smtplib.SMTP(host='smtp.gmail.com', port='587') as server:
+            server.starttls()
+            server.login(username, password)
+            server.send_message(email_msg, username, username)
+        
+   
+
 
 def format(element):
     return f"{element['date']} - {element['center_name']} ({element['capacity']})"
 
+
 id=int(get_state_id(headers))
 district_id=get_district_id(headers,id)
-directory=get_calender(district_id,headers)
-# print(directory)
 
 
-content = "\n".join([format(element) for element in directory])
+job(district_id,headers)
 
-username = ""
-password = ""
+schedule.every(15).minutes.do(job,district_id=district_id,headers=headers)
 
-print(content)
-
-if not content:
-    print("No availability")
-else:
-    email_msg = email.message.EmailMessage()
-    email_msg["Subject"] = "Vaccination Slot Open"
-    email_msg["From"] = username
-    email_msg["To"] = username
-    email_msg.set_content(content)
-
-    with smtplib.SMTP(host='smtp.gmail.com', port='587') as server:
-        server.starttls()
-        server.login(username, password)
-        server.send_message(email_msg, username, username)
-
-   
+while True:
+    schedule.run_pending()
+    time.sleep(1)
 
