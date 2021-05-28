@@ -10,7 +10,7 @@ headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gec
 def get_state_id(headers):
     r=requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states",headers=headers)
     r_dict=r.json()["states"]
-    # state_name=input("Enter the state name: ")
+    state_name=input("Enter the state name: ")
     a=-1
     for states in r_dict:
         if states["state_name"]=="Uttar Pradesh":
@@ -23,8 +23,9 @@ def get_district_id(headers,state_id):
  
     r=requests.get(url,headers=headers)
     r_dict=r.json()["districts"]
+    dist=input("Enter the district name: ")
     for district in r_dict:
-        if district["district_name"]=="Jhansi":
+        if district["district_name"]==dist:
             a=district["district_id"]
     return a
 
@@ -77,17 +78,17 @@ print(content)
 
 if not content:
     print("No availability")
-# else:
-#     email_msg = email.message.EmailMessage()
-#     email_msg["Subject"] = "Vaccination Slot Open"
-#     email_msg["From"] = username
-#     email_msg["To"] = username
-#     email_msg.set_content(content)
+else:
+    email_msg = email.message.EmailMessage()
+    email_msg["Subject"] = "Vaccination Slot Open"
+    email_msg["From"] = username
+    email_msg["To"] = username
+    email_msg.set_content(content)
 
-#     with smtplib.SMTP(host='smtp.gmail.com', port='587') as server:
-#         server.starttls()
-#         server.login(username, password)
-#         server.send_message(email_msg, username, username)
+    with smtplib.SMTP(host='smtp.gmail.com', port='587') as server:
+        server.starttls()
+        server.login(username, password)
+        server.send_message(email_msg, username, username)
 
    
 
