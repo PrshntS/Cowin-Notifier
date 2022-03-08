@@ -1,6 +1,7 @@
 import requests
 import schedule
 import time
+from datetime import datetime
 from datetime import date
 import email
 import smtplib
@@ -14,7 +15,7 @@ def get_state_id(headers):
     state_name=input("Enter the state name: ")
     a=-1
     for states in r_dict:
-        if states["state_name"]==state_name:
+        if states["state_name"].lower()==state_name.lower():
            a=states["state_id"]
     return a
 
@@ -26,7 +27,7 @@ def get_district_id(headers,state_id):
     r_dict=r.json()["districts"]
     dist=input("Enter the district name: ")
     for district in r_dict:
-        if district["district_name"]==dist:
+        if district["district_name"].lower()==dist.lower():
             a=district["district_id"]
     return a
 
@@ -67,10 +68,16 @@ def job(district_id,headers):
 
     content = "\n".join([format(element) for element in directory])
 
-    username = ""
-    password = ""
+   
+    username = "Sainiprashant232@gmail.com"
+    password = "djsccppczsbcqjmx"
 
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
     print(content)
+    print(" ")
 
     if not content:
         print("No availability")
@@ -86,6 +93,7 @@ def job(district_id,headers):
             server.starttls()
             server.login(username, password)
             server.send_message(email_msg, username, username)
+    
         
    
 
@@ -100,7 +108,7 @@ district_id=get_district_id(headers,id)
 
 job(district_id,headers)
 
-schedule.every(15).minutes.do(job,district_id=district_id,headers=headers)
+schedule.every(10).seconds.do(job,district_id=district_id,headers=headers)
 
 while True:
     schedule.run_pending()
